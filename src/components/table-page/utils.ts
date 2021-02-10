@@ -40,8 +40,8 @@ export const filterData = (
 ) => {
   const filteredBySearch = data.filter((item: ITableRow) => {
     const dataValues = values(item);
-    const str = join(dataValues, '');
-    return !search || (search && str.indexOf(search) !== -1);
+    const str = join(dataValues, '').toLocaleLowerCase();
+    return !search || (search && str.indexOf(search.toLocaleLowerCase()) !== -1);
   });
 
   const startOffset = page * pageSize;
