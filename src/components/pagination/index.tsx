@@ -4,14 +4,24 @@ import ReactPaginate from 'react-paginate';
 
 import { PaginationBox, StyledA } from './styled';
 
+import { TABLE_PAGE_SIZES } from '../../utils/constants';
+
 interface IProps {
   pageSize: number;
-  handleChangePage: () => void;
+  handleChangePage: (selectedItem: { selected: number }) => void;
   handleChangePageSize: (size: number) => void;
+  totalCount: number;
+  currPage: number;
 }
 
 export const Pagination = React.memo<IProps>(
-  ({ handleChangePage, handleChangePageSize, pageSize }) => {
+  ({
+    handleChangePage,
+    handleChangePageSize,
+    currPage,
+    totalCount,
+    pageSize,
+  }) => {
     const [isShown, setShown] = useState<boolean>(false);
     const toggle = () => setShown(!isShown);
     const onChangePageSize = (size: number) => {
@@ -21,12 +31,13 @@ export const Pagination = React.memo<IProps>(
     return (
       <PaginationBox>
         <ReactPaginate
-          pageCount={50}
+          pageCount={Math.ceil(totalCount / pageSize)}
           marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
+          pageRangeDisplayed={2}
           onPageChange={handleChangePage}
           containerClassName="pagination"
           activeClassName="active"
+          forcePage={currPage}
         />
         <PaginationBox>
           Change size:
@@ -44,15 +55,11 @@ export const Pagination = React.memo<IProps>(
               <span className="caret" />
             </button>
             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-              <li>
-                <StyledA onClick={() => onChangePageSize(20)}>20</StyledA>
-              </li>
-              <li>
-                <StyledA onClick={() => onChangePageSize(50)}>50</StyledA>
-              </li>
-              <li>
-                <StyledA onClick={() => onChangePageSize(100)}>100</StyledA>
-              </li>
+              {TABLE_PAGE_SIZES.map((size: number) => (
+                <li key={size}>
+                  <StyledA onClick={() => onChangePageSize(size)}>{size}</StyledA>
+                </li>
+              ))}
             </ul>
           </div>
         </PaginationBox>

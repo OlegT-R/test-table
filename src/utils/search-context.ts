@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Dispatch, SetStateAction } from 'react';
 
-export type SearchContextType = [string, Dispatch<SetStateAction<string>>];
+export type SearchContextType = [string, (search: string) => void];
 
 export const SearchContext = React.createContext<SearchContextType>([
   '',
