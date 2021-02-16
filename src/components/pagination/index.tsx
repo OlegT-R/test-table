@@ -57,7 +57,9 @@ export const Pagination = React.memo<IProps>(
             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
               {TABLE_PAGE_SIZES.map((size: number) => (
                 <li key={size}>
-                  <StyledA onClick={() => onChangePageSize(size)}>{size}</StyledA>
+                  <StyledA onClick={() => onChangePageSize(size)}>
+                    {size}
+                  </StyledA>
                 </li>
               ))}
             </ul>

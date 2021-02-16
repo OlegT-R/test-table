@@ -1,12 +1,19 @@
 import { useCallback, useState } from 'react';
+import { join, values, isEmpty, orderBy, keys } from 'lodash';
+
 import { DEFAULT_TABLE_PAGE_SIZE } from '../../utils/constants';
-import {ITableRow, TableDataType} from "../../entities";
-import {join, values} from "lodash";
+import { ITableRow, SortType, TableDataType } from '../../entities';
 
 export const useTableHandlerHook = () => {
   const [pageSize, setPageSize] = useState<number>(DEFAULT_TABLE_PAGE_SIZE);
   const [currPage, setCurrPage] = useState<number>(0);
   const [search, setSearch] = useState<string>('');
+  const [sort, setSort] = useState<Record<string, SortType>>({});
+
+  const handleChangeSort = useCallback((sort: Record<string, SortType>) => {
+    setCurrPage(0);
+    setSort(sort);
+  }, []);
 
   const handleChangeSearch = useCallback((search: string) => {
     setCurrPage(0);
@@ -26,6 +33,8 @@ export const useTableHandlerHook = () => {
     pageSize,
     currPage,
     search,
+    sort,
+    handleChangeSort,
     handleChangeSearch,
     handleChangePage,
     handleChangePageSize,
@@ -37,19 +46,29 @@ export const filterData = (
   search: string,
   page: number,
   pageSize: number,
+  sort: Record<string, SortType>,
 ) => {
-  const filteredBySearch = data.filter((item: ITableRow) => {
+
+  const withSortingData = isEmpty(sort)
+    ? data
+    : orderBy(data, keys(sort), values(sort));
+
+  const filteredBySearch = withSortingData.filter((item: ITableRow) => {
     const dataValues = values(item);
     const str = join(dataValues, '').toLocaleLowerCase();
-    return !search || (search && str.indexOf(search.toLocaleLowerCase()) !== -1);
+    return (
+      !search || (search && str.indexOf(search.toLocaleLowerCase()) !== -1)
+    );
   });
 
   const startOffset = page * pageSize;
-  const filteredData = filteredBySearch.slice(
+
+  const onlyCurrentPageData = filteredBySearch.slice(
     startOffset,
     startOffset + pageSize,
   );
 
   const totalItemsCount = search ? filteredBySearch.length : data.length;
-  return { filteredData, totalItemsCount };
+
+  return { preparedData: onlyCurrentPageData, totalItemsCount };
 };

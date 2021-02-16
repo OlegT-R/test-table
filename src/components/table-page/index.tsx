@@ -10,7 +10,6 @@ import { useTableHandlerHook, filterData } from './utils';
 import { SearchContext } from '../../utils/search-context';
 import { IColumn, TableDataType } from '../../entities';
 
-
 interface IProps {
   data: TableDataType;
   columns: IColumn[];
@@ -21,14 +20,16 @@ export const TablePage = React.memo<IProps>(({ columns, data }) => {
     search,
     pageSize,
     currPage,
+    sort,
+    handleChangeSort,
     handleChangeSearch,
     handleChangePage,
     handleChangePageSize,
   } = useTableHandlerHook();
 
-  const { filteredData, totalItemsCount } = useMemo(
-    () => filterData(data, search, currPage, pageSize),
-    [data, search, currPage, pageSize],
+  const { preparedData, totalItemsCount } = useMemo(
+    () => filterData(data, search, currPage, pageSize, sort),
+    [data, search, currPage, pageSize, sort],
   );
   return (
     <Container>
@@ -36,7 +37,12 @@ export const TablePage = React.memo<IProps>(({ columns, data }) => {
         <SearchBox>
           <Search />
         </SearchBox>
-        <Table columns={columns} data={filteredData} />
+        <Table
+          columns={columns}
+          data={preparedData}
+          sort={sort}
+          setSort={handleChangeSort}
+        />
         <Pagination
           handleChangePage={handleChangePage}
           handleChangePageSize={handleChangePageSize}
